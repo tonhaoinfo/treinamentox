@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.5.14/iframeResizer.contentWindow.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.js"></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.senior.com.br/bpm/1.10.0/workflow-cockpit.min.js"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>
+    <title>Example BPM</title>
+  </head>
+  <body style="margin: revert">
+    <div id="app">
+      <form class="row g-3 needs-validation" id="form" novalidate>
+        <div class="col-md-6">
+          <label for="nomFun" class="form-label">Nome Solicitante</label>
+          <input type="text" class="form-control" id="nomFun" disabled />
+        </div>
+        <div class="col-md-6">
+          <label for="emaFun" class="form-label">Email</label>
+          <input type="email" class="form-control" id="emaFun" disabled />
+        </div>
+        <div class="col-12">
+          <label for="desMot" class="form-label">Motivo solicitação</label>
+          <input type="text" class="form-control" id="desMot" />
+          <div id="desMot" class="form-text">
+            Informe detalhadamente o motivo da sua solicitação.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label for="nomDes" class="form-label">Destino</label>
+          <input type="text" class="form-control" id="nomDes" />
+        </div>
+        <div class="col-md-4">
+          <label for="estDes" class="form-label">Estado</label>
+          <select id="estDes" class="form-select">
+            <option selected>Selecione...</option>
+            <option value="Acre - AC">Acre - AC</option>
+            <option value="Alagoas - AL">Alagoas - AL</option>
+            <option value="Amapá - AP">Amapá - AP</option>
+            <option value="Amazonas - AM">Amazonas - AM</option>
+            <option value="Bahia - BA">Bahia - BA</option>
+            <option value="Ceará - CE">Ceará - CE</option>
+            <option value="Espírito Santo - ES">Espírito Santo - ES</option>
+            <option value="Goiás - GO">Goiás - GO</option>
+            <option value="Maranhão - MA">Maranhão - MA</option>
+            <option value="Mato Grosso - MT">Mato Grosso - MT</option>
+            <option value="Mato Grosso do Sul - MS">
+              Mato Grosso do Sul - MS
+            </option>
+            <option value="Minas Gerais - MG">Minas Gerais - MG</option>
+            <option value="Pará - PA">Pará - PA</option>
+            <option value="Paraíba - PB">Paraíba - PB</option>
+            <option value="Paraná - PR">Paraná - PR</option>
+            <option value="Pernambuco - PE">Pernambuco - PE</option>
+            <option value="Piauí - PI">Piauí - PI</option>
+            <option value="Rio de Janeiro - RJ">Rio de Janeiro - RJ</option>
+            <option value="Rio Grande do Norte - RN">
+              Rio Grande do Norte - RN
+            </option>
+            <option value="Rio Grande do Sul - RS">Rio Grande do Sul - RS</option>
+            <option value="Rondônia - RO">Rondônia - RO</option>
+            <option value="Roraima - RR">Roraima - RR</option>
+            <option value="Santa Catarina - SC">Santa Catarina - SC</option>
+            <option value="São Paulo - SP">São Paulo - SP</option>
+            <option value="Sergipe - SE">Sergipe - SE</option>
+            <option value="Tocantins - TO">Tocantins - TO</option>
+            <option value="Distrito Federal - DF">Distrito Federal - DF</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label for="numCep" class="form-label">CEP</label>
+          <input
+            type="text"
+            class="form-control"
+            id="numCep"
+            placeholder="00.000-000"
+          />
+        </div>
+        <div class="col-12">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="gridCheck"
+              onclick="onSelect()"
+              required
+            />
+            <label class="form-check-label" for="gridCheck">
+              Declaro que estou ciente com os termos de empréstimo
+            </label>
+            <div class="invalid-feedback">
+              Você precisa aceitar os termos para prosseguir.
+            </div>
+          </div>
+        </div>
+  
+        <!-- Para formulários do BPM, não é necessário colocar botões para submit, basta usar o botão 'Enviar' do próprio BPM -->
+        <!-- <button type="submit" class="btn btn-primary" onclick="isFormValid()">Submit</button> -->
+      </form>
+    </div>
+    
+  </body>
+
+  <script>
+    //Inicialização da API do workflow
+    this.workflowCockpit = workflowCockpit({
+      init: _init,
+      onSubmit: _saveData,
+      onError: _rollback,
+    });
+
+    // Função init é chamada ao abrir o formulário
+    function _init(data, info) {
+      
+      // Caso seja executado algum serviço externo ao abrir o formulário e o retorno dele seja atribuído a variáveis de execução
+      // essas variáveis serão preenchidas
+      const { initialVariables } = data.loadContext;
+      console.log(initialVariables);
+      
+      info
+        .getUserData()
+        .then(function (user) {
+          // Usuário logado
+          document.getElementById("nomFun").setAttribute("value", user.fullname);
+          document.getElementById("emaFun").setAttribute("value", user.email);
+        })
+        .then(function () {
+          info.getPlatformData().then(function (platformData) {
+            // Informações da G7
+            console.log(platformData);
+          });
+        });
+
+      // Retorna os dados que já foram previamente preenchidos no formulário
+      info.getInfoFromProcessVariables().then(function (data) {
+        console.log(data)
+        // Somente recupera os dados caso não seja a criação de uma tarefa (somente se estiver tratando a tarefa)
+        if (!info.isRequestNew() && Array.isArray(data)) {
+          var map = new Map();
+          for (i = 0; i < data.length; i++) {
+              map.set(data[i].key, data[i].value || '');
+          }
+
+          console.log("Carregando Dados", map);
+          const nomDes = map.get("nomDes") || '';
+          const desMot = map.get("desMot") || '';
+          const estDes = map.get("estDes") || '';
+          const numCep = map.get("numCep") || '';
+
+          document.getElementById("nomDes").setAttribute("value", nomDes);
+          document.getElementById("desMot").setAttribute("value", desMot);
+          document.getElementById("estDes").value = estDes;
+          document.getElementById("numCep").setAttribute("value", numCep);
+        }
+      });
+    }
+
+    // Essa função é chamada quando o usuário clicar no botão 'Enviar'
+    function _saveData(data, info) {
+      if (!isFormValid()) {
+        document.getElementById("gridCheck").setAttribute("class", "form-check-input is-invalid");
+        throw new Error("Os dados informados não são válidos.");
+      }
+      let newData = {};
+      let selectEstado = document.getElementById("estDes");
+
+      newData.desMot = document.getElementById("desMot").value;
+      newData.nomDes = document.getElementById("nomDes").value;
+      newData.estDes = selectEstado.options[selectEstado.selectedIndex].value;
+      newData.numCep = document.getElementById("numCep").value;
+      newData.check = document.getElementById("gridCheck").value;
+      console.log(newData);
+      return {
+        formData: newData,
+      };
+    }
+
+    function _rollback(data, info) {
+      /*data: ({
+          error: obj
+          processInstanceId: int
+        })*/
+    }
+
+    function isFormValid() {
+      const isChecked = document.getElementById("gridCheck").checked;  
+      return isChecked;
+    }
+
+    // Handler de eventos do checkbox
+    function onSelect() {
+      const isChecked = document.getElementById("gridCheck").checked;  
+      if (isChecked) {
+        document.getElementById("gridCheck").setAttribute("class", "form-check-input is-valid");
+      } else {
+        document.getElementById("gridCheck").setAttribute("class", "form-check-input is-invalid");
+      }
+    }
+
+    // Disabling form submissions if there are invalid fields
+    (function () {
+      "use strict";
+
+      // Fetch all the forms we want to apply custom Bootstrap validation styles to
+      var forms = document.querySelectorAll(".needs-validation");
+
+      // Loop over them and prevent submission
+      Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener(
+          "submit",
+          function (event) {
+            if (!form.checkValidity()) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+
+            form.classList.add("was-validated");
+          },
+          false
+        );
+      });
+    })();
+  </script>
+</html>
